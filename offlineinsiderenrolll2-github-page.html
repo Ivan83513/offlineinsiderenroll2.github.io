@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, initial-scale=1.0">
+  <title>OfflineInsiderEnroll2</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0&display=swap">
+  
+  <style>
+    /* ==========================================================================
+       1. COLOR SYSTEM & CSS VARIABLES (M3 Dynamic Scheme Teal Fallback)
+       ========================================================================== */
+    :root {
+      /* Light Mode Palette */
+      --md-sys-color-primary: #00696E;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #9CF1F6;
+      --md-sys-color-on-primary-container: #002022;
+      --md-sys-color-secondary-container: #CCE8E9;
+      --md-sys-color-on-secondary-container: #051F20;
+      --md-sys-color-tertiary-container: #D2E4FF;
+      --md-sys-color-on-tertiary-container: #001C3B;
+      --md-sys-color-surface: #F4FBFB;
+      --md-sys-color-surface-container-low: #EEF5F5;
+      --md-sys-color-surface-container: #E8EFEF;
+      --md-sys-color-surface-container-high: #E2EAEA;
+      --md-sys-color-surface-container-highest: #DDE4E4;
+      --md-sys-color-on-surface: #161D1D;
+      --md-sys-color-on-surface-variant: #3F4948;
+      --md-sys-color-outline: #6F7979;
+      --md-sys-color-outline-variant: #BEC8C8;
+      --md-sys-color-inverse-surface: #2B3232;
+      --md-sys-color-inverse-on-surface: #ECF2F2;
+      --md-sys-color-inverse-primary: #80D5DA;
+      --md-sys-color-error: #B3261E;
+      --md-sys-color-on-error: #FFFFFF;
+      --md-sys-color-error-container: #F9DEDC;
+      --md-sys-color-on-error-container: #410E0B;
+
+      /* Standard Motion & Radius */
+      --md-motion-standard: cubic-bezier(0.2, 0.0, 0, 1.0);
+      --md-shape-corner-card: 20px;
+      --md-shape-corner-dialog: 28px;
+      --md-shape-corner-fab: 16px;
+      --md-shape-corner-chip: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Dark Mode Palette */
+        --md-sys-color-primary: #83D4D8;
+        --md-sys-color-on-primary: #063639;
+        --md-sys-color-primary-container: #0B4F52;
+        --md-sys-color-on-primary-container: #9FF0F5;
+        --md-sys-color-secondary-container: #354A4C;
+        --md-sys-color-on-secondary-container: #CFE7E8;
+        --md-sys-color-tertiary-container: #38485A;
+        --md-sys-color-on-tertiary-container: #D3E4FA;
+        --md-sys-color-surface: #0D1515;
+        --md-sys-color-surface-container-low: #161D1D;
+        --md-sys-color-surface-container: #1A2121;
+        --md-sys-color-surface-container-high: #252B2B;
+        --md-sys-color-surface-container-highest: #2F3636;
+        --md-sys-color-on-surface: #DCE4E4;
+        --md-sys-color-on-surface-variant: #B7CACB;
+        --md-sys-color-outline: #819495;
+        --md-sys-color-outline-variant: #394A4B;
+        --md-sys-color-inverse-surface: #DCE4E4;
+        --md-sys-color-inverse-on-surface: #2B3232;
+        --md-sys-color-inverse-primary: #00696E;
+        --md-sys-color-error: #F2B8B5;
+        --md-sys-color-on-error: #601410;
+        --md-sys-color-error-container: #8C1D18;
+        --md-sys-color-on-error-container: #F9DEDC;
+      }
+    }
+
+    /* ==========================================================================
+       2. GLOBAL BASE STYLES
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Target Viewport Desktop Base */
+    #app-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      position: relative;
+    }
+
+    /* ==========================================================================
+       3. NAVIGATION RAIL (LEFT 80px)
+       ========================================================================== */
+    .nav-rail {
+      width: 80px;
+      height: 100%;
+      background-color: var(--md-sys-color-surface-container);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 24px;
+      gap: 16px;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      width: 100%;
+      gap: 4px;
+      background: none;
+      border: none;
+      outline: none;
+    }
+
+    .nav-icon-container {
+      width: 56px;
+      height: 32px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: background-color 0.25s var(--md-motion-standard), color 0.25s var(--md-motion-standard);
+    }
+
+    .nav-item.active .nav-icon-container {
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+    }
+
+    .nav-label {
+      font-size: 12px;
+      line-height: 1.33;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: color 0.25s var(--md-motion-standard);
+    }
+
+    .nav-item.active .nav-label {
+      color: var(--md-sys-color-on-surface);
+      font-weight: 700;
+    }
+
+    /* Ripple & Feedback */
+    .nav-item:active .nav-icon-container {
+      transform: scale(0.95);
+    }
+
+    /* ==========================================================================
+       4. MAIN VIEW AREA & SCREENS
+       ========================================================================== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Top App Bar */
+    .top-app-bar {
+      height: 64px;
+      background-color: var(--md-sys-color-surface);
+      display: flex;
+      align-items: center;
+      padding: 0 16px 0 24px;
+      z-index: 5;
+      transition: background-color 0.2s;
+    }
+
+    .top-app-bar-title {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.28;
+      color: var(--md-sys-color-on-surface);
+      margin-top: 2px; /* Fine-tuned alignment */
+    }
+
+    /* Screens Transition Container */
+    .screen {
+      position: absolute;
+      top: 64px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 16px 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--md-motion-standard);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ==========================================================================
+       5. SCREEN 1: 首页 (Home)
+       ========================================================================== */
+    .home-top-text {
+      font-size: 28px;
+      line-height: 1.4;
+      color: var(--md-sys-color-on-surface);
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .row-chips {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .filter-chip {
+      height: 32px;
+      border-radius: var(--md-shape-corner-chip);
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, background-color 0.2s;
+    }
+
+    .filter-chip:active {
+      transform: scale(0.96);
+    }
+
+    .row-texts {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .text-28 {
+      font-size: 28px;
+      line-height: 1.4;
+      color: var(--md-sys-color-on-surface-variant);
+      white-space: nowrap;
+    }
+
+    /* Expressive Shape-Shifting Loading Indicator */
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: auto 0;
+    }
+
+    .loading-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background-color: var(--md-sys-color-secondary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .expressive-morph-shape {
+      width: 32px;
+      height: 32px;
+      background-color: var(--md-sys-color-on-secondary-container);
+      animation: morphRotate 2.4s infinite var(--md-motion-standard);
+    }
+
+    @keyframes morphRotate {
+      0% {
+        border-radius: 50%;
+        transform: rotate(0deg) scale(0.8);
+      }
+      33% {
+        border-radius: 8px;
+        transform: rotate(120deg) scale(1.1);
+      }
+      66% {
+        border-radius: 28% 72% 30% 70% / 70% 30% 70% 30%;
+        transform: rotate(240deg) scale(0.9);
+      }
+      100% {
+        border-radius: 50%;
+        transform: rotate(360deg) scale(0.8);
+      }
+    }
+
+    /* Bottom-Right Row Container */
+    .home-bottom-row {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* M3 Snackbar */
+    .snackbar {
+      height: 48px;
+      border-radius: 8px;
+      background-color: var(--md-sys-color-inverse-surface);
+      color: var(--md-sys-color-inverse-on-surface);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      font-size: 14px;
+      transition: opacity 0.25s var(--md-motion-standard), transform 0.25s;
+    }
+
+    .snackbar-btn {
+      background: none;
+      border: none;
+      color: var(--md-sys-color-inverse-primary);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .snackbar-btn:hover {
+      background-color: rgba(255,255,255,0.08);
+    }
+
+    /* Standard FAB (56dp) */
+    .fab {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--md-shape-corner-fab);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .fab.tonal {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .fab:active {
+      transform: scale(0.92);
+    }
+
+    /* ==========================================================================
+       6. SCREEN 2: 功能 (Features Animation Screen)
+       ========================================================================== */
+    #screen-features {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .feature-text {
+      position: absolute;
+      font-size: 28px;
+      color: var(--md-sys-color-on-surface);
+      font-weight: 500;
+      transition: all 1.2s var(--md-motion-standard);
+      opacity: 1;
+      white-space: nowrap;
+    }
+
+    /* Positions prior to convergence */
+    .ft-pos-1 { top: 20%; left: 50%; transform: translate(-50%, 0) rotate(-12deg); }
+    .ft-pos-2 { top: 40%; left: 15%; transform: translate(0, 0) rotate(8deg); }
+    .ft-pos-3 { top: 40%; right: 15%; transform: translate(0, 0) rotate(-6deg); }
+    .ft-pos-4 { bottom: 25%; left: 50%; transform: translate(-50%, 0) rotate(15deg); }
+
+    /* Converged center state */
+    .feature-text.converged {
+      top: 50% !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: auto !important;
+      transform: translate(-50%, -50%) rotate(0deg) scale(0.2) !important;
+      opacity: 0 !important;
+    }
+
+    /* Big Main Title after convergence */
+    .merged-title {
+      font-size: 45px;
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
+      transform: scale(0);
+      opacity: 0;
+      transition: all 0.8s var(--md-motion-standard);
+    }
+
+    .merged-title.show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .features-fab-container {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.4s var(--md-motion-standard);
+      pointer-events: none;
+    }
+
+    .features-fab-container.show {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* ==========================================================================
+       7. SCREEN 3: 使用 (Usage)
+       ========================================================================== */
+    #screen-usage {
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .usage-step-text {
+      font-size: 28px;
+      color: var(--md-sys-color-on-surface);
+      font-weight: 500;
+      height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* M3 Expressive Custom Slider */
+    .slider-wrapper {
+      width: 480px;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .slider-track-bg {
+      width: 100%;
+      height: 16px;
+      border-radius: 8px;
+      background-color: var(--md-sys-color-secondary-container);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider-track-fill {
+      height: 100%;
+      width: 40%;
+      background-color: var(--md-sys-color-primary);
+      border-radius: 8px 0 0 8px;
+      transition: width 0.05s linear;
+    }
+
+    .slider-input {
+      position: absolute;
+      width: 100%;
+      height: 44px;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 3;
+      top: -14px;
+      left: 0;
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 40%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 44px;
+      background-color: var(--md-sys-color-primary);
+      border-radius: 2px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      pointer-events: none;
+      z-index: 2;
+      transition: left 0.05s linear;
+    }
+
+    /* ==========================================================================
+       8. SCREEN 4: 关于 (About)
+       ========================================================================== */
+    #screen-about {
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .about-avatar {
+      width: 168px;
+      height: 168px;
+      border-radius: var(--md-shape-corner-card);
+      object-fit: cover;
+      background-color: var(--md-sys-color-surface-container-highest);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .about-author {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .about-url {
+      font-size: 28px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* Extended FAB */
+    .extended-fab {
+      height: 56px;
+      padding: 0 24px;
+      border-radius: var(--md-shape-corner-fab);
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+      margin-top: 12px;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .extended-fab:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    <nav class="nav-rail">
+      <button class="nav-item active" onclick="switchTab('home', this)">
+        <div class="nav-icon-container">
+          <span class="material-symbols-rounded">home</span>
+        </div>
+        <span class="nav-label">首页</span>
+      </button>
+
+      <button class="nav-item" onclick="switchTab('features', this)">
+        <div class="nav-icon-container">
+          <span class="material-symbols-rounded">ads_click</span>
+        </div>
+        <span class="nav-label">功能</span>
+      </button>
+
+      <button class="nav-item" onclick="switchTab('usage', this)">
+        <div class="nav-icon-container">
+          <span class="material-symbols-rounded">download</span>
+        </div>
+        <span class="nav-label">使用</span>
+      </button>
+
+      <button class="nav-item" onclick="switchTab('about', this)">
+        <div class="nav-icon-container">
+          <span class="material-symbols-rounded">info</span>
+        </div>
+        <span class="nav-label">关于</span>
+      </button>
+    </nav>
+
+    <div class="main-wrapper">
+      <header class="top-app-bar">
+        <h1 class="top-app-bar-title">OfflineInsiderEnroll2</h1>
+      </header>
+
+      <main id="screen-home" class="screen active">
+        <div class="home-top-text">一个带UI的小程序，让您轻松管理预览版更新！</div>
+
+        <div class="row-chips">
+          <button class="filter-chip" onclick="toggleChip(this)">
+            <span class="material-symbols-rounded" style="font-size:18px;">check</span>简单
+          </button>
+          <button class="filter-chip" onclick="toggleChip(this)">
+            <span class="material-symbols-rounded" style="font-size:18px;">check</span>易用
+          </button>
+          <button class="filter-chip" onclick="toggleChip(this)">
+            <span class="material-symbols-rounded" style="font-size:18px;">check</span>无门槛
+          </button>
+        </div>
+
+        <div class="row-texts">
+          <span class="text-28">一键注册，无需登录</span>
+          <span class="text-28">无需多余操作，操控权在你手上</span>
+          <span class="text-28">无需登录微软账号</span>
+        </div>
+
+        <div class="loading-container" id="home-loader">
+          <div class="loading-circle">
+            <div class="expressive-morph-shape"></div>
+          </div>
+        </div>
+
+        <div class="home-bottom-row">
+          <div class="snackbar" id="dev-snackbar">
+            <span>仍在开发中，谨慎使用！</span>
+            <button class="snackbar-btn" onclick="closeSnackbar()">关闭</button>
+          </div>
+          <button class="fab tonal" title="下载程序" onclick="openReleases()">
+            <span class="material-symbols-rounded">download</span>
+          </button>
+        </div>
+      </main>
+
+      <main id="screen-features" class="screen">
+        <div class="feature-text ft-pos-1" id="ft1">一键完成操作</div>
+        <div class="feature-text ft-pos-2" id="ft2">无设备限制</div>
+        <div class="feature-text ft-pos-3" id="ft3">出错直接重设</div>
+        <div class="feature-text ft-pos-4" id="ft4">绕过微软限制，无需登录微软账户</div>
+
+        <div class="merged-title" id="merged-title">OfflineInsiderEnroll2</div>
+
+        <div class="features-fab-container" id="ft-fab">
+          <button class="fab tonal" title="下载程序" onclick="openReleases()">
+            <span class="material-symbols-rounded">download</span>
+          </button>
+        </div>
+      </main>
+
+      <main id="screen-usage" class="screen">
+        <div class="usage-step-text" id="step-text">2. 以管理员身份运行程序</div>
+
+        <div class="slider-wrapper">
+          <div class="slider-track-bg">
+            <div class="slider-track-fill" id="slider-fill"></div>
+          </div>
+          <div class="slider-handle" id="slider-handle"></div>
+          <input type="range" min="0" max="100" value="40" class="slider-input" id="usage-slider" oninput="updateSlider(this.value)">
+        </div>
+      </main>
+
+      <main id="screen-about" class="screen">
+        <img src="https://avatars.githubusercontent.com/u/209226161?v=4" alt="Ivan83513 Avatar" class="about-avatar">
+        <div class="about-author">@Ivan83513</div>
+        <div class="about-url">https://github.com/Ivan83513</div>
+        <button class="extended-fab" onclick="openGithubProfile()">
+          <span class="material-symbols-rounded">language</span>
+          在Github中打开
+        </button>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       PERSISTENCE & APP STATE
+       ========================================================================== */
+    const DB_NAME = 'OfflineInsiderDB';
+    const STORE_NAME = 'app_state';
+
+    function initDB() {
+      return new Promise((resolve) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+      });
+    }
+
+    async function saveState(key, val) {
+      const db = await initDB();
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(val, key);
+    }
+
+    async function getState(key, defaultVal) {
+      const db = await initDB();
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get(key);
+        req.onsuccess = () => resolve(req.result !== undefined ? req.result : defaultVal);
+      });
+    }
+
+    /* ==========================================================================
+       ROUTING & SCREEN SWITCHING
+       ========================================================================== */
+    function switchTab(screenId, targetBtn) {
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      targetBtn.classList.add('active');
+
+      document.querySelectorAll('.screen').forEach(scr => scr.classList.remove('active'));
+      const activeScreen = document.getElementById(`screen-${screenId}`);
+      activeScreen.classList.add('active');
+
+      saveState('last_screen', screenId);
+
+      // Trigger feature convergence animation when entering 'features' screen
+      if (screenId === 'features') {
+        runFeatureAnimation();
+      }
+    }
+
+    /* ==========================================================================
+       SCREEN 1: HOME CONTROLS
+       ========================================================================== */
+    function closeSnackbar() {
+      const sb = document.getElementById('dev-snackbar');
+      sb.style.opacity = '0';
+      sb.style.transform = 'translateY(10px)';
+      setTimeout(() => sb.style.display = 'none', 250);
+      saveState('snackbar_closed', true);
+    }
+
+    function toggleChip(chipBtn) {
+      chipBtn.classList.toggle('selected');
+      if (chipBtn.classList.contains('selected')) {
+        chipBtn.style.backgroundColor = 'var(--md-sys-color-primary-container)';
+        chipBtn.style.color = 'var(--md-sys-color-on-primary-container)';
+      } else {
+        chipBtn.style.backgroundColor = 'var(--md-sys-color-secondary-container)';
+        chipBtn.style.color = 'var(--md-sys-color-on-secondary-container)';
+      }
+    }
+
+    // Auto load state demo for M3 expressive shape shifting indicator
+    setTimeout(() => {
+      const loader = document.getElementById('home-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        loader.style.transition = 'opacity 0.4s var(--md-motion-standard)';
+        setTimeout(() => loader.style.display = 'none', 400);
+      }
+    }, 3200);
+
+    /* ==========================================================================
+       SCREEN 2: FEATURE ANIMATION LOGIC
+       ========================================================================== */
+    function runFeatureAnimation() {
+      const fts = [
+        document.getElementById('ft1'),
+        document.getElementById('ft2'),
+        document.getElementById('ft3'),
+        document.getElementById('ft4')
+      ];
+      const title = document.getElementById('merged-title');
+      const fab = document.getElementById('ft-fab');
+
+      // Reset
+      fts.forEach(el => el.classList.remove('converged'));
+      title.classList.remove('show');
+      fab.classList.remove('show');
+
+      // Step 1: Rotate and Converge to Center
+      setTimeout(() => {
+        fts.forEach(el => el.classList.add('converged'));
+      }, 800);
+
+      // Step 2: Show Program Name Title & Download FAB
+      setTimeout(() => {
+        title.classList.add('show');
+        fab.classList.add('show');
+      }, 2000);
+    }
+
+    /* ==========================================================================
+       SCREEN 3: USAGE SLIDER LOGIC
+       ========================================================================== */
+    function updateSlider(val) {
+      const fill = document.getElementById('slider-fill');
+      const handle = document.getElementById('slider-handle');
+      const text = document.getElementById('step-text');
+
+      fill.style.width = val + '%';
+      handle.style.left = val + '%';
+
+      if (val <= 33) {
+        text.innerText = "1. 从Github下载程序";
+      } else if (val <= 66) {
+        text.innerText = "2. 以管理员身份运行程序";
+      } else {
+        text.innerText = "3. 选择要注册频道并点击Go";
+      }
+
+      saveState('slider_val', val);
+    }
+
+    /* ==========================================================================
+       GLOBAL ACTIONS
+       ========================================================================== */
+    function openReleases() {
+      window.open('https://github.com/Ivan83513/OfflineInsiderEnrollCpp/releases', '_blank');
+    }
+
+    function openGithubProfile() {
+      window.open('https://github.com/Ivan83513', '_blank');
+    }
+
+    /* Restore Persisted State on Initialization */
+    window.addEventListener('DOMContentLoaded', async () => {
+      const isClosed = await getState('snackbar_closed', false);
+      if (isClosed) {
+        const sb = document.getElementById('dev-snackbar');
+        if (sb) sb.style.display = 'none';
+      }
+
+      const savedVal = await getState('slider_val', 40);
+      const slider = document.getElementById('usage-slider');
+      if (slider) {
+        slider.value = savedVal;
+        updateSlider(savedVal);
+      }
+    });
+  </script>
+</body>
+</html>
